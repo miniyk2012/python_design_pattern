@@ -10,6 +10,7 @@ Welcome to try_sphinx's documentation!
 ^^^^^
 .. toctree::
    :maxdepth: 2
+   :glob:
 
    beginning/index
    base/index
