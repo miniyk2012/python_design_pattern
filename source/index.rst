@@ -1,0 +1,124 @@
+.. try_sphinx documentation master file, created by
+   sphinx-quickstart on Tue Oct 12 07:35:47 2021.
+   You can adapt this file completely to your liking, but it should at least
+   contain the root `toctree` directive.
+
+Welcome to try_sphinx's documentation!
+======================================
+
+目录:
+^^^^^
+.. toctree::
+   :maxdepth: 2
+
+   beginning/index
+   base/index
+
+
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
+
+
+
+
+你好呀, 同志
+这还是第一段
+
+这是第二段
+   哦哦牛逼
+
+无序列表使用 ``-`` , ``*`` , ``+`` 来标记:
+
+- 无序列表第一项
+- 无序列表第二项
+
+1. 有序列表第一项
+2. 有序列表第二项
+
+#. 自动编号的列表第一项
+#. 自动编号的列表第二项
+
+这是一个定义列表:
+
+term
+    术语定义必须缩进
+
+    可以包含多个段落
+
+next term
+    术语描述
+
+下面是一个嵌套列表, 每一级别向右缩进一次, 同级别缩进应相同:
+
+1. 有序列表第一项
+    * 无序列表第一项
+    * 无序列表第二项
+#. 有序列表第二项
+    + 无序列表第一项
+    + 无序列表第二项
+
+
+标记符号 :: 紧接一空白行, 然后紧跟代码, 整个代码文本块必须缩进 
+::
+
+    some codes
+    some codes
+    some codes
+
+没有缩进, 这里不是代码, 是正常段落!
+
+此外, 高级的代码高亮功能可是使用 
+
+.. code-block:: python
+   :caption: Code Blocks can have captions.
+   :linenos:
+   :emphasize-lines: 3,5
+
+   def some_function():
+       interesting = False
+       print 'This line is highlighted.'
+       print 'This one is not...'
+       print '...but this one is.'
+
+
+.. sidebar:: 这是一个侧边栏
+
+   这是一个侧边栏, 可以放入代码, 也可以放入图像代码等等, 它下面可以是文字, 图像, 代码等等, 如本例中下面是一段文字.
+
+冬日，在暖暖的午后，泡上一杯茶，随便拿起一本书，凑到阳光跟前，是何等的惬意与享受……
+
+风虽然不大，但走在路上，鼻子冷的刺骨的疼；而阳光却那么地温热，温热地忍不住想和她亲吻。
+
+我泡上一杯碧螺春，从书架上随便拿起一本书，走向靠窗的位置，凑到阳光面前，任由她吻着我的脸，就像吻着自己的情人，这感觉美好的让你忘却了所有的烦恼。
+
+也许是身边暖气的缘故，空气的影子，映衬到桌子上、书纸上。影影绰绰如月下之花影，飘飘忽忽如山间之云气，生生腾腾如村落之炊烟，荡荡漾漾如湖面之微波，似乎在这图书馆的这一隅便可看尽天地间的朴素与祥和。
+
+This is a paragraph that contains `Link text <http://example.com/>`_
+
+
+我后面插入了一个自编号的脚注 [#f1]_ , 后面又跟了一个手动编号的脚注 [2]_ , 后面还跟着一个自动编号的 [#fn]_ .
+
+阿发的发
+
+.. rubric:: Footnotes
+
+.. [#f1] 我是自编号脚注1
+.. [2] 我是手动编号脚注2
+.. [#fn] 我是自编号脚注3
+
+.. table:: Truth table for "not"
+   :name: table-Not
+
+   =====  =====
+   A      not A
+   =====  =====
+   False  True
+   True   False
+   =====  =====
+
+可以通过 :table:numref:`table-Not` 引用.
+
+你好呀 ``people``
+
