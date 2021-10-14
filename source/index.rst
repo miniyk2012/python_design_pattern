@@ -12,9 +12,9 @@ Welcome to try_sphinx's documentation!
    :maxdepth: 2
    
 
+   hello
    beginning/index
    base/index
-   hello
 
 
 
