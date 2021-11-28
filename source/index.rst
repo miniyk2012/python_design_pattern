@@ -4,7 +4,7 @@ python设计模式
 .. toctree::
    :maxdepth: 2
    :glob:
-   :caption: 目录:
+   :caption: Contents:
 
    四人帮/组合优于继承/index
 
