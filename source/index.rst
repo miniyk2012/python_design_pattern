@@ -1,25 +1,22 @@
-.. try_sphinx documentation master file, created by
-   sphinx-quickstart on Tue Oct 12 07:35:47 2021.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
 python设计模式
 ======================================
 
-目录:
-^^^^^
 .. toctree::
    :maxdepth: 2
-   
+   :glob:
+   :caption: 目录:
 
-   hello
-   beginning/index
-   base/index
+   四人帮/组合优于继承/index
 
 
+这本书是我很早以前就想翻译了, 主要是国内关于python设计模式的书很少, 而且这本书我看到中文也暂时没有翻译版. 过去一直没有持续的时间去做这样一件事, 现在想想可以开始了.
+
+
+
+
+
+索引与搜索
+==================
 
 * :ref:`genindex`
 * :ref:`search`
-
-
-这本书是我很早以前就想翻译
