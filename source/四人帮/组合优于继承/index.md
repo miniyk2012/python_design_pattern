@@ -10,4 +10,7 @@
 
 *组合优于继承*
 
-https://python-patterns.guide/gang-of-four/composition-over-inheritance/
+考虑一个设计问题，看看该原则是如何通过几个经典的四人帮设计模式来实现. 每个设计模式都装配简单的类, 不使用继承，它们被组装成一个优雅的运行时解决方案.
+
+## 问题: 子类爆炸
+
