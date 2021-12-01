@@ -15,7 +15,6 @@
 # sys.path.insert(0, os.path.abspath('.'))
 
 # -- Project information -----------------------------------------------------
-
 project = 'python设计模式'
 copyright = '2021, yangkai.04'
 author = 'yangkai.04'

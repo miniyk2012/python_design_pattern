@@ -49,11 +49,25 @@ class SyslogLogger(Logger):
         syslog.syslog(self.priority, message)
 ```
 
-当这第一个设计轴被另一个设计轴所交织时，问题就出现. 让我们想象一下，现在需要对日志信息进行过滤--一些用户只想看到带有"Error"的消息，于是开发一个Logger的子类:
+当这第一个设计轴被另一个设计轴所交织时，问题就出现了. 让我们想象一下，现在需要对日志信息进行过滤--一些用户只想看到带有"Error"的消息，于是开发一个Logger的子类:
 
 ```python
+# New design direction: filtering messages.
 
+class FilteredLogger(Logger):
+    def __init__(self, pattern, file):
+        self.pattern = pattern
+        super().__init__(file)
 
+    def log(self, message):
+        if self.pattern in message:
+            super().log(message)
+
+# It works.
+
+f = FilteredLogger('Error', sys.stdout)
+f.log('Ignored: this is not important')
+f.log('Error: but you want to see this')
 ```
 
 https://python-patterns.guide/gang-of-four/composition-over-inheritance/
