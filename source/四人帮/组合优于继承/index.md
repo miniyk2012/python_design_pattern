@@ -70,4 +70,26 @@ f.log('Ignored: this is not important')
 f.log('Error: but you want to see this')
 ```
 
+陷阱已经埋下, 若应用日志不写入文件, 而是由socket发送, 并且需要过滤, 那么它就会迅速膨胀. 已存在的类没法覆盖这个case. 若开发者继续进行子类化，并创建一个结合了两个类特征的FilteredSocketLogger，那么子类爆炸就开始了. 
+
+或许开发者很幸运, 因为没有更多的组合了. 但总的来讲, 应用会产生6个类:
+
+```
+Logger            FilteredLogger
+SocketLogger      FilteredSocketLogger
+SyslogLogger      FilteredSyslogLogger
+```
+
+类的数量会随着*m*和*n*几何级数增加. 这就是是"类的扩散"和"子类的爆炸", 是四人帮想避免的问题.
+
+The solution is to recognize that a class responsible for both filtering messages and logging messages is too complicated. In modern Object Oriented practice, it would be accused of violating the “Single Responsibility Principle.”
+
+But how can we distribute the two features of message filtering and message output across different classes?
+
+解决办法是认识到一个既负责过滤消息又负责记录消息的类太复杂了. 在现代面向对象的实践中, 它将被指责为违反了"单一责任原则".
+
+但是，我们怎样才能将消息过滤和消息输出这两个功能分布在不同的类中呢？
+
+## 方法一: 适配器模式
+
 https://python-patterns.guide/gang-of-four/composition-over-inheritance/
