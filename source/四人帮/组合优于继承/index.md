@@ -82,10 +82,6 @@ SyslogLogger      FilteredSyslogLogger
 
 类的数量会随着*m*和*n*几何级数增加. 这就是是"类的扩散"和"子类的爆炸", 是四人帮想避免的问题.
 
-The solution is to recognize that a class responsible for both filtering messages and logging messages is too complicated. In modern Object Oriented practice, it would be accused of violating the “Single Responsibility Principle.”
-
-But how can we distribute the two features of message filtering and message output across different classes?
-
 解决办法是认识到一个既负责过滤消息又负责记录消息的类太复杂了. 在现代面向对象的实践中, 它将被指责为违反了"单一责任原则".
 
 但是，我们怎样才能将消息过滤和消息输出这两个功能分布在不同的类中呢？
