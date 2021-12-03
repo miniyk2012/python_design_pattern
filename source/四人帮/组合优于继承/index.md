@@ -80,12 +80,66 @@ SocketLogger      FilteredSocketLogger
 SyslogLogger      FilteredSyslogLogger
 ```
 
-类的数量会随着*m*和*n*几何级数增加. 这就是是"类的扩散"和"子类的爆炸", 是四人帮想避免的问题.
+类的数量会随着*m*和*n*几何级数增加. 这就是是"类的扩散"和"子类爆炸", 是四人帮想避免的问题.
 
 解决办法是认识到一个既负责过滤消息又负责记录消息的类太复杂了. 在现代面向对象的实践中, 它将被指责为违反了"单一责任原则".
 
 但是，我们怎样才能将消息过滤和消息输出这两个功能分布在不同的类中呢？
 
 ## 方法一: 适配器模式
+
+一个解决方案是适配器模式：原本的logger类不需要改进，因为任何输出消息的机制都可以被包装成"文件"对象, 传给logger.
+
+1. 因此我们保持原有的`Logger`.
+2. 我们也保持`FilteredLogger`不变.
+3. 不是创建专门的目的地子类, 而是创建不同输出目的地的"文件"适配器，然后将该适配器传递给logger.
+
+下面是另外2种输出的适配器:
+
+```python
+import socket
+
+class FileLikeSocket:
+    def __init__(self, sock):
+        self.sock = sock
+
+    def write(self, message_and_newline):
+        self.sock.sendall(message_and_newline.encode('ascii'))
+
+    def flush(self):
+        pass
+
+class FileLikeSyslog:
+    def __init__(self, priority):
+        self.priority = priority
+
+    def write(self, message_and_newline):
+        message = message_and_newline.rstrip('\n')
+        syslog.syslog(self.priority, message)
+
+    def flush(self):
+        pass
+```
+
+python鼓励鸭子类型, 因此适配器只需提供正确的方法--例如我们的适配器就免于继承它们所包装的类或模拟的文件类型. 它们也无须重新实现真正文件的全部十几个方法. 就像如果你只要鸭子叫，那么鸭子会不会走路并不重要, 我们的适配器只需要实现两个文件方法(译者注: write和flush), 它们是`Logger`真正使用的方法.
+
+这样一来"子类爆炸"就避免了! Logger对象和适配器对象可以自由组合与匹配, 
+
+```python
+sock1, sock2 = socket.socketpair()
+
+fs = FileLikeSocket(sock1)
+logger = FilteredLogger('Error', fs)
+logger.log('Warning: message number one')
+logger.log('Error: message number two')
+
+print('The socket received: %r' % sock2.recv(512))
+```
+
+```bash
+The socket received: b'Error: message number two\n'
+```
+
+注意，上面的`FileLikeSocket`类只是为了举例--在现实中, 该适配器是内置在Python的标准库中. 只需调用socket的[makefile()](https://docs.python.org/3/library/socket.html#socket.socket.makefile)方法, 就可以得到一个完整的适配器, 使套接字似乎是一个文件.
 
 https://python-patterns.guide/gang-of-four/composition-over-inheritance/
