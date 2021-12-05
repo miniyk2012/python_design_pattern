@@ -86,7 +86,7 @@ SyslogLogger      FilteredSyslogLogger
 
 但是，我们怎样才能将消息过滤和消息输出这两个功能分布在不同的类中呢？
 
-## 方法一: 适配器模式
+## 方法1: 适配器模式
 
 一个解决方案是适配器模式：原本的logger类不需要改进，因为任何输出消息的机制都可以被包装成"文件"对象, 传给logger.
 
@@ -123,7 +123,7 @@ class FileLikeSyslog:
 
 python鼓励鸭子类型, 因此适配器只需提供正确的方法--例如我们的适配器就免于继承它们所包装的类或模拟的文件类型. 它们也无须重新实现真正文件的全部十几个方法. 就像如果你只要鸭子叫，那么鸭子会不会走路并不重要, 我们的适配器只需要实现两个文件方法(译者注: write和flush), 它们是`Logger`真正使用的方法.
 
-这样一来"子类爆炸"就避免了! Logger对象和适配器对象可以自由组合与匹配, 
+这样一来"子类爆炸"就避免了! Logger对象和适配器对象可以在运行时自由组合与匹配.
 
 ```python
 sock1, sock2 = socket.socketpair()
@@ -141,5 +141,14 @@ The socket received: b'Error: message number two\n'
 ```
 
 注意，上面的`FileLikeSocket`类只是为了举例--在现实中, 该适配器是内置在Python的标准库中. 只需调用socket的[makefile()](https://docs.python.org/3/library/socket.html#socket.socket.makefile)方法, 就可以得到一个完整的适配器, 使套接字似乎是一个文件.
+
+## 方法2: 桥接模式
+
+The Bridge Pattern splits a class’s behavior between an outer “abstraction” object that the caller sees and an “implementation” object that’s wrapped inside. We can apply the Bridge Pattern to our logging example if we make the (perhaps slightly arbitrary) decision that filtering belongs out in the “abstraction” class while output belongs in the “implementation” class.
+
+桥接模式将一个类的行为分隔开来, 调用者看到的是外部"抽象"对象, 内部则是"实现"对象. 如果我们决定将过滤功能归为"抽象"类, 而输出归为"实现"类(也许有点武断), 那么就能将桥接模式应用到logging例子中.
+
+As in the Adapter case, a separate echelon of classes now governs writing. But instead of having to contort our output classes to match the interface of a Python file object — which required the awkward maneuver of adding a newline in the logger that sometimes had to be removed again in the adapter — we now get to define the interface of the wrapped class ourselves.
+
 
 https://python-patterns.guide/gang-of-four/composition-over-inheritance/
