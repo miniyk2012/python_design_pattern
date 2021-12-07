@@ -210,10 +210,6 @@ logger.log('Error: this is important')
 Error: this is important
 ```
 
-This presents more symmetry than the Adapter. Instead of file output being native to the Logger but non-file output requiring an additional class, a functioning logger is now always built by composing an abstraction with an implementation.
-
-Once again, the subclass explosion is avoided because two kinds of class are composed together at runtime without requiring either class to be extended.
-
 这比适配器更对称. 过去文件输出是Logger的原生部分, 若是非文件输出需要适配一个额外的类. 现在, 一个具备功能的logger总是由一个抽象和一个实现组合而成.
 
 子类爆炸再一次被避免了, 因为两种类在运行时被组合在一起, 不需要任何一个类被扩展.
