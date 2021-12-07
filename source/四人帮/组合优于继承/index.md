@@ -144,11 +144,80 @@ The socket received: b'Error: message number two\n'
 
 ## 方法2: 桥接模式
 
-The Bridge Pattern splits a class’s behavior between an outer “abstraction” object that the caller sees and an “implementation” object that’s wrapped inside. We can apply the Bridge Pattern to our logging example if we make the (perhaps slightly arbitrary) decision that filtering belongs out in the “abstraction” class while output belongs in the “implementation” class.
-
 桥接模式将一个类的行为分隔开来, 调用者看到的是外部"抽象"对象, 内部则是"实现"对象. 如果我们决定将过滤功能归为"抽象"类, 而输出归为"实现"类(也许有点武断), 那么就能将桥接模式应用到logging例子中.
 
-As in the Adapter case, a separate echelon of classes now governs writing. But instead of having to contort our output classes to match the interface of a Python file object — which required the awkward maneuver of adding a newline in the logger that sometimes had to be removed again in the adapter — we now get to define the interface of the wrapped class ourselves.
+就和适配器一样, 现在有一组单独的类来负责write. 但是不必再改变输出类来匹配Python文件对象的接口--这需要在logger添加一个换行, 有时还需要再次删除--我们现在可以自己定义封装类的接口.
 
+So let’s design the inner “implementation” object to accept a raw message, rather than needing a newline appended, and reduce the interface to only a single method emit() instead of also having to support a flush() method that was usually a no-op.
+
+因此让我们定义一个接收原始消息的内部实现, 不需要添加换行, 并自定义接口只有一个emit()方法而不需要flush()方法.
+
+```python
+# The “abstractions” that callers will see.
+
+class Logger(object):
+    def __init__(self, handler):
+        self.handler = handler
+
+    def log(self, message):
+        self.handler.emit(message)
+
+class FilteredLogger(Logger):
+    def __init__(self, pattern, handler):
+        self.pattern = pattern
+        super().__init__(handler)
+
+    def log(self, message):
+        if self.pattern in message:
+            super().log(message)
+
+# The “implementations” hidden behind the scenes.
+
+class FileHandler:
+    def __init__(self, file):
+        self.file = file
+
+    def emit(self, message):
+        self.file.write(message + '\n')
+        self.file.flush()
+
+class SocketHandler:
+    def __init__(self, sock):
+        self.sock = sock
+
+    def emit(self, message):
+        self.sock.sendall((message + '\n').encode('ascii'))
+
+class SyslogHandler:
+    def __init__(self, priority):
+        self.priority = priority
+
+    def emit(self, message):
+        syslog.syslog(self.priority, message)
+```
+
+抽象对象和实现对象可以在运行时自由组合.
+
+```python
+handler = FileHandler(sys.stdout)
+logger = FilteredLogger('Error', handler)
+
+logger.log('Ignored: this will not be logged')
+logger.log('Error: this is important')
+```
+
+```bash
+Error: this is important
+```
+
+This presents more symmetry than the Adapter. Instead of file output being native to the Logger but non-file output requiring an additional class, a functioning logger is now always built by composing an abstraction with an implementation.
+
+Once again, the subclass explosion is avoided because two kinds of class are composed together at runtime without requiring either class to be extended.
+
+这比适配器更对称. 过去文件输出是Logger的原生部分, 若是非文件输出需要适配一个额外的类. 现在, 一个具备功能的logger总是由一个抽象和一个实现组合而成.
+
+子类爆炸再一次被避免了, 因为两种类在运行时被组合在一起, 不需要任何一个类被扩展.
 
 https://python-patterns.guide/gang-of-four/composition-over-inheritance/
+
+
