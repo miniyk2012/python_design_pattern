@@ -214,6 +214,84 @@ Error: this is important
 
 子类爆炸再一次被避免了, 因为两种类在运行时被组合在一起, 不需要任何一个类被扩展.
 
+## 方法3: 装饰器模式
+
+要是我们想给一个logger添加2个过滤器怎么办? 前面的方法都不支持多个过滤器, 即1个过滤优先级, 一个过滤关键字.
+
+如果我们让过滤器和handler提供相同的接口，即都有一个log()方法，那么我们就得到了装饰器模式.
+
+```python
+class FileLogger:
+    def __init__(self, file):
+        self.file = file
+
+    def log(self, message):
+        self.file.write(message + '\n')
+        self.file.flush()
+
+class SocketLogger:
+    def __init__(self, sock):
+        self.sock = sock
+
+    def log(self, message):
+        self.sock.sendall((message + '\n').encode('ascii'))
+
+class SyslogLogger:
+    def __init__(self, priority):
+        self.priority = priority
+
+    def log(self, message):
+        syslog.syslog(self.priority, message)
+
+# The filter calls the same method it offers.
+
+class LogFilter:
+    def __init__(self, pattern, logger):
+        self.pattern = pattern
+        self.logger = logger
+
+    def log(self, message):
+        if self.pattern in message:
+            self.logger.log(message)
+```
+
+过滤代码首次被移到任何特定的日志类之外. 相反，它现在是一个独立的功能，可以包裹任何我们想要的日志类.
+
+和前两种方法一样, 过滤器可以在运行时与输出类组合, 而无需构建新的复杂的类.
+```python
+log1 = FileLogger(sys.stdout)
+log2 = LogFilter('Error', log1)
+
+log1.log('Noisy: this logger always produces output')
+
+log2.log('Ignored: this will be filtered out')
+log2.log('Error: this is important and gets printed')
+```
+
+```bash
+Noisy: this logger always produces output
+Error: this is important and gets printed
+```
+
+而且由于装饰器的对称性, 它们提供了与它们所包装类相同的接口 -- 我们可以把好多filter叠在一起作用在一个log上!
+
+```python
+log3 = LogFilter('severe', log2)
+
+log3.log('Error: this is bad, but not that bad')
+log3.log('Error: this is pretty severe')
+```
+
+```bash
+Error: this is pretty severe
+```
+
+但是请注意这个设计的对称性会被打破: 虽然过滤器可以被叠在一起，但是输出过程不能被组合或堆叠. 日志消息仍然只有一个输出.
+
+## 方法4: 四人帮之外的模式
+
+
 https://python-patterns.guide/gang-of-four/composition-over-inheritance/
+
 
 
