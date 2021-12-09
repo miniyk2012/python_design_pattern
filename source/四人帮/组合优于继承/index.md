@@ -291,6 +291,7 @@ Error: this is pretty severe
 
 ## 方法4: 四人帮之外的模式
 
+python的logging模块想要更加灵活: 单个日志消息流不仅支持多个过滤器, 也支持多个输出. 基于其他语言中日志模块的设计 -- 见[PEP282](https://www.python.org/dev/peps/pep-0282/)的"Influences"部分的主要灵感 -- Python日志模块实现了自己的组合优于继承模式。
 
 https://python-patterns.guide/gang-of-four/composition-over-inheritance/
 
