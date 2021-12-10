@@ -293,6 +293,61 @@ Error: this is pretty severe
 
 python的logging模块想要更加灵活: 单个日志消息流不仅支持多个过滤器, 也支持多个输出. 基于其他语言中日志模块的设计 -- 见[PEP282](https://www.python.org/dev/peps/pep-0282/)的"Influences"部分的主要灵感 -- Python日志模块实现了自己的组合优于继承模式。
 
+1. 调用者与之交互的Logger类本身并不实现过滤或输出. 相反它维护一个过滤器列表和一个处理器(handler)列表.
+2. 对于每条日志消息, logger都会调用其每个过滤器. 如果有任何过滤器拒绝, 该消息就会被丢弃。
+3. 对于每条被所有过滤器接受的日志消息, 日志记录器会遍历每个输出处理器, 要求每一个处理器发射该消息.
+
+或者至少这就是其核心思想. 标准库的logging模块实际上更加复杂. 例如除了logger所有的过滤器外, 每个处理器可以携带自己的过滤器列表. 每个处理器还指定了一个最低的消息"级别", 比如INFO或WARN. 相当令人困惑的是, 这个级别既不是由处理器本身也不是由它的任何过滤器来执行, 而是由深埋在logger中的if语句来执行, 该logger是遍历这些处理器的. 因此整个设计有点混乱.
+
+但我们可以借鉴标准库logging的基本思路 -- 一个logger的消息既有多个过滤器又有得多个输出 -- 来完全解耦过滤器类和处理器类.
+
+```python
+# There is now only one logger.
+
+class Logger:
+    def __init__(self, filters, handlers):
+        self.filters = filters
+        self.handlers = handlers
+
+    def log(self, message):
+        if all(f.match(message) for f in self.filters):
+            for h in self.handlers:
+                h.emit(message)
+
+# Filters now know only about strings!
+
+class TextFilter:
+    def __init__(self, pattern):
+        self.pattern = pattern
+
+    def match(self, text):
+        return self.pattern in text
+
+# Handlers look like “loggers” did in the previous solution.
+
+class FileHandler:
+    def __init__(self, file):
+        self.file = file
+
+    def emit(self, message):
+        self.file.write(message + '\n')
+        self.file.flush()
+
+class SocketHandler:
+    def __init__(self, sock):
+        self.sock = sock
+
+    def emit(self, message):
+        self.sock.sendall((message + '\n').encode('ascii'))
+
+class SyslogHandler:
+    def __init__(self, priority):
+        self.priority = priority
+
+    def emit(self, message):
+        syslog.syslog(self.priority, message)
+```
+
 https://python-patterns.guide/gang-of-four/composition-over-inheritance/
 
 
