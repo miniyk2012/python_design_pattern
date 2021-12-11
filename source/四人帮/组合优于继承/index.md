@@ -348,6 +348,29 @@ class SyslogHandler:
         syslog.syslog(self.priority, message)
 ```
 
+请注意, 知道我们最后一个设计, 过滤器才真正以其应有的简单性闪亮登场. 这是首次它只接受一个字符串, 只返回一个判定. 之前所有的设计要么是将过滤功能隐藏在日志类中, 要么是让过滤器承担额外的职责, 而不是简单地执行一个判定. 
+
+事实上，"log"这个词已经从过滤器类的名称中完全删除了, 而且有一个非常重要的原因: 它再也不与任何特定日志有关. `TextFilter`现在完全可以在任何涉及到字符串的情况下重用. 最后与日志的具体概念解耦, 过滤器变得更容易测试和维护.
+
+同样, 就像所有组合优于继承的解决方案一样, 类在运行时组合，而不需要任何继承.
+
+```python
+f = TextFilter('Error')
+h = FileHandler(sys.stdout)
+logger = Logger([f], [h])
+
+logger.log('Ignored: this will not be logged')
+logger.log('Error: this is important')
+```
+
+```bash
+Error: this is important
+```
+
+这里有一个关键的教训:像组合优于继承这样的设计原则, 最终要比Adapter或Decorator这样的个别模式更重要. 始终遵循原则, 而不要总是被限制在官方列表中选择模式. 我们现在得出的设计比以前的任何一个设计都更灵活, 也更容易维护, 尽管前面的设计是基于官方的四人帮模式, 但这个最终的设计却不是. 有时候, 是的, 你会发现一个现有的设计模式完全适合你的问题 -- 但如果不是, 那只要你比它们好就行.
+
+# Dodge: "if"语句
+
 https://python-patterns.guide/gang-of-four/composition-over-inheritance/
 
 
