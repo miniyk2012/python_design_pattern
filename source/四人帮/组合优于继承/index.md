@@ -369,7 +369,61 @@ Error: this is important
 
 这里有一个关键的教训:像组合优于继承这样的设计原则, 最终要比Adapter或Decorator这样的个别模式更重要. 始终遵循原则, 而不要总是被限制在官方列表中选择模式. 我们现在得出的设计比以前的任何一个设计都更灵活, 也更容易维护, 尽管前面的设计是基于官方的四人帮模式, 但这个最终的设计却不是. 有时候, 是的, 你会发现一个现有的设计模式完全适合你的问题 -- 但如果不是, 那只要你比它们好就行.
 
-# Dodge: "if"语句
+## 诡计: "if"语句
+
+我怀疑上面的代码让许多读者感到惊奇. 对于一个典型的Python程序员来说, 如此大量地使用类可能看起来完全是矫揉造作的 --这是一种试图使1980年代的旧观念与现代Python相关的尴尬做法.
+
+当一个新的设计需求出现时, 典型的Python程序员真的会去写一个新的类吗？没有！"简单比复杂好". 如果一个if语句就可以, 为什么要增加一个类呢？单个记录器类可以逐渐增加条件, 直到它处理所有与我们之前的例子相同的情况.
+
+```python
+# Each new feature as an “if” statement.
+
+class Logger:
+    def __init__(self, pattern=None, file=None, sock=None, priority=None):
+        self.pattern = pattern
+        self.file = file
+        self.sock = sock
+        self.priority = priority
+
+    def log(self, message):
+        if self.pattern is not None:
+            if self.pattern not in message:
+                return
+        if self.file is not None:
+            self.file.write(message + '\n')
+            self.file.flush()
+        if self.sock is not None:
+            self.sock.sendall((message + '\n').encode('ascii'))
+        if self.priority is not None:
+            syslog.syslog(self.priority, message)
+
+# Works just fine.
+
+logger = Logger(pattern='Error', file=sys.stdout)
+
+logger.log('Warning: not that important')
+logger.log('Error: this is important')
+```
+
+```bash
+Error: this is important
+```
+
+你可能认识到这个例子是你在实际应用中遇到的比较典型的Python设计实践.
+
+if语句的方法并非完全没有好处. 这个类的所有可能的行为都可以在从上到下阅读代码的过程中掌握. 参数列表可能看起来很冗长，但是由于Python的可选关键字参数, 对这个类的大多数调用不需要提供所有的四个参数.
+
+(这个类确实只能处理一个文件和一个套接字, 但这是为了可读性而附带进行的简化. 我们可以很容易地将文件和套接字的参数转变为文件和套接字的列表).
+
+鉴于每个Python程序员都能很快学会if, 但要花更多的时间来理解类, 依靠最简单的机制来实现一个功能, 似乎是一个明显的胜利. 但是让我们来平衡一下这种诱惑，明确说明躲避组合大于继承所带来的损失:
+
+1. **本地性**.
+
+
+
+由于所有这些原因, 我表明了从软件设计的角度来看, if语句森林的表面简单性在很大程度上是一种错觉. 将logger的代码自上而下阅读的能力, 是以其他几种概念上的花费为代价的, 这些花费会随着代码库的大小而急剧增长.
+
+## 诡计: 多继承
 
 https://python-patterns.guide/gang-of-four/composition-over-inheritance/
 
