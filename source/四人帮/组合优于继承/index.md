@@ -417,7 +417,13 @@ if语句的方法并非完全没有好处. 这个类的所有可能的行为都�
 
 鉴于每个Python程序员都能很快学会if, 但要花更多的时间来理解类, 依靠最简单的机制来实现一个功能, 似乎是一个明显的胜利. 但是让我们来平衡一下这种诱惑，明确说明躲避组合大于继承所带来的损失:
 
-1. **局部性**.
+
+
+1. **局部性**. 重组代码以使用if语句, 对于可读性来说并不是一个无懈可击的胜利. 如果你的任务是改进或调试一个特定的功能 -- 比如说支持写入套接字 -- 你会发现你无法在一处地方阅读它的代码. 该单一功能背后的代码散落在初始化方法的参数列表, 初始化方法的实现和log()方法之间.
+
+2. **可删除性**. 好的设计的一个未被重视的特性是它使删除功能变得容易. 也许只有大型和成熟的Python应用程序的老手才会强烈地体会到删除代码对项目健康的重要性. 在我们基于类的解决方案中, 我们可以通过删除SocketHandler类和它的单元测试, 在应用程序不再需要它的时候, 轻而易举地删除像记录日志到套接字的功能. 相比之下, 从if语句森林中删除socket功能不仅需要谨慎, 以避免破坏相邻的代码, 而且还提出了一个尴尬的问题: 如何处理初始化器中的socket参数. 它可以被删除吗？如果我们需要保持位置参数列表的一致性就不行 -- 我们需要保留这个参数, 但如果它被使用就会引发一个异常.
+
+3. Dead code analysis. Related to the previous point is the fact that when we use Composition Over Inheritance, dead code analyzers can trivially detect when the last use of SocketHandler in the codebase disappears. But dead code analysis is often helpless to make a determination like “you can now remove all the attributes and if statements related to socket output, because no surviving call to the initializer passes anything for socket other than None.”
 
 
 
