@@ -417,18 +417,15 @@ if语句的方法并非完全没有好处. 这个类的所有可能的行为都�
 
 鉴于每个Python程序员都能很快学会if, 但要花更多的时间来理解类, 依靠最简单的机制来实现一个功能, 似乎是一个明显的胜利. 但是让我们来平衡一下这种诱惑，明确说明躲避组合大于继承所带来的损失:
 
-
-
 1. **局部性**. 重组代码以使用if语句, 对于可读性来说并不是一个无懈可击的胜利. 如果你的任务是改进或调试一个特定的功能 -- 比如说支持写入套接字 -- 你会发现你无法在一处地方阅读它的代码. 该单一功能背后的代码散落在初始化方法的参数列表, 初始化方法的实现和log()方法之间.
 
 2. **可删除性**. 好的设计的一个未被重视的特性是它使删除功能变得容易. 也许只有大型和成熟的Python应用程序的老手才会强烈地体会到删除代码对项目健康的重要性. 在我们基于类的解决方案中, 我们可以通过删除SocketHandler类和它的单元测试, 在应用程序不再需要它的时候, 轻而易举地删除像记录日志到套接字的功能. 相比之下, 从if语句森林中删除socket功能不仅需要谨慎, 以避免破坏相邻的代码, 而且还提出了一个尴尬的问题: 如何处理初始化器中的socket参数. 它可以被删除吗？如果我们需要保持位置参数列表的一致性就不行 -- 我们需要保留这个参数, 但如果它被使用就会引发一个异常.
 
 3. **死忘代码分析**. 与上一点有关的实事是, 当我们使用组合优于继承时, 死亡代码分析器可以轻松检测到代码库中最后一次使用SocketHandler的时间点. 但对于"你可以删除所有关于套接字输出的属性和if语句", 死亡代码分析往往无能为. 这是因为除了知道调用初始化方法时传的sock为None外, 对于其他我们一无所知.
 
-4. **测试**. One of the strongest signals about code health that our tests provide is how many lines of irrelevant code have to run before reaching the line under test. Testing a feature like logging to a socket is easy if the test can simply spin up a SocketHandler instance, pass it a live socket, and ask it to emit() a message. No code runs except code relevant to the feature. But testing socket logging in our forest of if statements will run at least three times the number of lines of code. Having to set up a logger with the right combination of several features merely to test one of them is an important warning sign, that might seem trivial in this small example but becomes crucial as a system grows larger.
+4. **测试**. 我们的测试提供了关于代码健康状况的诸多信号, 其中一种最强烈的是, 在到达被测行之前要运行多少行不相关的代码. 如果测试可以简单地启动一个SocketHandler实例，传递给它一个开启的套接字，并要求它发出一个消息, 那么测试打日志到套接字这样的功能就很容易. 除了与该功能相关的代码外, 没有其他代码运行. 但是在我们的if语句森林中测试套接字日志, 至少要运行三倍的代码行数. 仅仅为了测试其中的一个功能，就必须正确组合多个特性来构造logger, 这是一个非常重要的警告信号, 在这个小例子中可能看起来微不足道, 但随着系统的扩大，这一点变得至关重要.
 
-
-
+5. **效率**. 我故意把这一点放在最后, 因为可读性和可维护性通常是更重要的问题. 但是if语句森林的设计问题还表现在该方法的低效率上. 即使你想要简单的把未经过滤的日志输出到一个文件中, 每一条消息也都将被迫运行所有可能使用到的特性的if语句. 相比之下, 组合技术只运行你所组装的功能的代码.
 
 由于所有这些原因, 我表明了从软件设计的角度来看, if语句森林的表面简单性在很大程度上是一种错觉. 将logger的代码自上而下阅读的能力, 是以其他几种概念上的花费为代价的, 这些花费会随着代码库的大小而急剧增长.
 
