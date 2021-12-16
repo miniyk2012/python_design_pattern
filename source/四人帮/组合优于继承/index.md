@@ -431,6 +431,61 @@ if语句的方法并非完全没有好处. 这个类的所有可能的行为都�
 
 ## 诡计: 多继承
 
+Some Python projects fall short of practicing Composition Over Inheritance because they are tempted to dodge the principle by means of a controversial feature of the Python language: multiple inheritance.
+
+一些Python项目没有实践"组合优于继承"原则, 因为它们想通过Python语言的一个有争议的特性来回避这个原则: 多重继承。
+
+让我们回到我们最初的例子, `FilteredLogger`和`SocketLogger`是基类`Logger`的两个不同子类. 在一个只支持单一继承的语言中, `FilteredSocketLogger`将不得不选择从SocketLogger或FilteredLogger继承, 然后不得不重复另一个类的代码.
+
+但python支持多重继承, 因此新`FilteredSocketLogger`类可以同时继承`SocketLogger`h和`FilteredLogger`.
+
+```python
+# Our original example’s base class and subclasses.
+
+class Logger(object):
+    def __init__(self, file):
+        self.file = file
+
+    def log(self, message):
+        self.file.write(message + '\n')
+        self.file.flush()
+
+class SocketLogger(Logger):
+    def __init__(self, sock):
+        self.sock = sock
+
+    def log(self, message):
+        self.sock.sendall((message + '\n').encode('ascii'))
+
+class FilteredLogger(Logger):
+    def __init__(self, pattern, file):
+        self.pattern = pattern
+        super().__init__(file)
+
+    def log(self, message):
+        if self.pattern in message:
+            super().log(message)
+
+# A class derived through multiple inheritance.
+
+class FilteredSocketLogger(FilteredLogger, SocketLogger):
+    def __init__(self, pattern, sock):
+        FilteredLogger.__init__(self, pattern, None)
+        SocketLogger.__init__(self, sock)
+
+# Works just fine.
+
+logger = FilteredSocketLogger('Error', sock1)
+logger.log('Warning: not that important')
+logger.log('Error: this is important')
+
+print('The socket received: %r' % sock2.recv(512))
+```
+
+```bash
+The socket received: b'Error: this is important\n'
+```
+
 https://python-patterns.guide/gang-of-four/composition-over-inheritance/
 
 
