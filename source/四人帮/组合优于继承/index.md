@@ -486,6 +486,13 @@ print('The socket received: %r' % sock2.recv(512))
 The socket received: b'Error: this is important\n'
 ```
 
+这与我们的装饰器模式解决方案有几处惊人的相似之处: 
+
+* 每种输出都有一个logger类(而不是适配器模式那样, 直接写文件和通过适配器不写文件这样的不对称).
+* 消息保留了由调用者提供的精确值(而不是适配器那样习惯于通过添加换行来替换为文件特定值).
+* 过滤器和记录器是对称的，因为它们都实现了相同的方法`log()`(除了装饰器模式外, 我们的其他解决方案是过滤器类提供一种方法, 而输出类提供另一种方法).
+* 过滤器不尝试自己产生输出, 但如果一条消息在过滤过程中幸存下来, 就会把输出的任务推迟到其他代码.
+
 https://python-patterns.guide/gang-of-four/composition-over-inheritance/
 
 
