@@ -503,7 +503,12 @@ The socket received: b'Error: this is important\n'
 
     因此，测试套件必须超越单元测试, 在多重继承的类上测试 -- 或者用monkey patch来验证`log()`调用了`super().log()` -- 以保证多重继承在为了的开发中继续正常工作.
 
-2. 
+2. 多重继承引入了一个新的`__init__()`方法，因为基类的`__init__()`方法无法接收足够的参数用于组合过滤器和记录器. 这段新的代码需要被测试，所以每个新的子类至少需要一个测试用例.
+    你可能会被诱惑去构思一个方案来避免每个子类都有一个新的`__init__()`, 比如接受 `*args`然后把它们传递给`super().__init__()`. (如果你真的采用这种方法, 请回顾经典文章["Python’s Super Considered Harmful"](https://fuhm.net/super-harmful/)，它认为事实上只有`**kw`是安全的.) 这种方案的问题在于它损害了可读性 -- 你不能再仅仅通过阅读参数列表来弄清` __init__()`方法需要哪些参数. 而类型检查工具将不再能够保证正确性.
+
+    但是无论你是给每个派生类自身的`__init__()`还是将它们设计成链状, 你对原始的 `FilteredLogger`和`SocketLogger`的单元测试本身并不能保证这些类在组合时能正确初始化.
+
+    相比之下, 装饰器模式下, 初始化时过滤器和记录器轻易就严格正交. 过滤器设置pattern, 记录器接收sock, 两者之间不可能有冲突.
 
 
 https://python-patterns.guide/gang-of-four/composition-over-inheritance/
