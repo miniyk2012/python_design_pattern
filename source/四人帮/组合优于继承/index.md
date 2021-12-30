@@ -530,6 +530,72 @@ The socket received: b'Error: this is important\n'
 
 ## 诡计: 混入(Mixins)
 
+上节提到的`FilteredSocketLogger`需要自定义`__init__()`方法, 因为它需要为2个基类提供参数, 但这是可以避免的. 当然如果子类不再需要额外的数据, 问题就不复存在. 但即使子类需要额外的数据, 也可以用其他方式来提供.
+
+如果我们在`FilteredLogger`为类属性`pattern`变量设置一个默认值, 让调用方自行设置`pattern`, 而不是在初始化时设置, 就可以让`FilteredLogger`对多重继承更友好:
+
+```python
+# Don’t accept a “pattern” during initialization.
+
+class FilteredLogger(Logger):
+    pattern = ''
+
+    def log(self, message):
+        if self.pattern in message:
+            super().log(message)
+
+# Multiple inheritance is now simpler.
+
+class FilteredSocketLogger(FilteredLogger, SocketLogger):
+    pass  # This subclass needs no extra code!
+
+# The caller can just set “pattern” directly.
+
+logger = FilteredSocketLogger(sock1)
+logger.pattern = 'Error'
+
+# Works just fine.
+
+logger.log('Warning: not that important')
+logger.log('Error: this is important')
+
+print('The socket received: %r' % sock2.recv(512))
+```
+
+```bash
+The socket received: b'Error: this is important\n'
+```
+
+在将`FilteredLogger`作为一种与其基类正交的初始化手法之后, 为什么不将正交的想法推向逻辑结论呢? 我们可以将`FilteredLogger`转换为一个"混入", 它完全处在类的层次结构之外, 多重继承只是将其和继承层次组合起来使用.
+
+```python
+# Simplify the filter by making it a mixin.
+
+class FilterMixin:  # No base class!
+    pattern = ''
+
+    def log(self, message):
+        if self.pattern in message:
+            super().log(message)
+
+# Multiple inheritance looks the same as above.
+
+class FilteredLogger(FilterMixin, FileLogger):
+    pass  # Again, the subclass needs no extra code.
+
+# Works just fine.
+
+logger = FilteredLogger(sys.stdout)
+logger.pattern = 'Error'
+logger.log('Warning: not that important')
+logger.log('Error: this is important')
+```
+
+```bash
+Error: this is important
+```
+
+
 https://python-patterns.guide/gang-of-four/composition-over-inheritance/
 
 
