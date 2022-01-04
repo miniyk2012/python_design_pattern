@@ -594,11 +594,6 @@ logger.log('Error: this is important')
 ```bash
 Error: this is important
 ```
-The mixin is conceptually simpler than the filtered subclass we saw in the last section: it has no base class that might complicate method resolution order, so super() will always call the next base class listed in the class statement.
-
-A mixin also has a simpler testing story than the equivalent subclass. Whereas the FilteredLogger would need tests that both run it standalone and also combine it with other classes, the FilterMixin only needs tests that combine it with a logger. Because the mixin is by itself incomplete, a test can’t even be written that runs it standalone.
-
-But all the other liabilities of multiple inheritance still apply. So while the mixin pattern does improve the readability and conceptual simplicity of multiple inheritance, it’s not a complete solution for its problems.
 
 混入在概念上比上节看到的过滤器子类简单: 它没有基类, 不用担心方法解析顺序, 因此`super()`总会调用在声明在继承类列表中的下一个基类.
 
