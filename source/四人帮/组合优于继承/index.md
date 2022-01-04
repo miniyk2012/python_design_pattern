@@ -594,7 +594,63 @@ logger.log('Error: this is important')
 ```bash
 Error: this is important
 ```
+The mixin is conceptually simpler than the filtered subclass we saw in the last section: it has no base class that might complicate method resolution order, so super() will always call the next base class listed in the class statement.
 
+A mixin also has a simpler testing story than the equivalent subclass. Whereas the FilteredLogger would need tests that both run it standalone and also combine it with other classes, the FilterMixin only needs tests that combine it with a logger. Because the mixin is by itself incomplete, a test can’t even be written that runs it standalone.
+
+But all the other liabilities of multiple inheritance still apply. So while the mixin pattern does improve the readability and conceptual simplicity of multiple inheritance, it’s not a complete solution for its problems.
+
+混入在概念上比上节看到的过滤器子类简单: 它没有基类, 不用担心方法解析顺序, 因此`super()`总会调用在声明在继承类列表中的下一个基类.
+
+混入的测试也比等效的子类简单. 虽然`FilteredLogger`既需要单独测试也需要与其他类组合起来测试, 但`FilterMixin`只需要与记录器类合起来测试. 因为混入自身是不完整的, 没办法只对它做测试.
+
+但所有其他多重继承的责任仍然适用于混入. 因此尽管混入模式提高了代码可读性并且在概念是简化了多重继承, 但它仍然不是彻底的解决方案.
+
+## 诡计: 动态构建类
+
+正如我们在前两节所看到的, 无论是传统的多重继承还是混入，都不能解决四人帮的"所有组合的子类爆炸"问题 -- 它们只是在需要组合两个类时避免了代码的重复.
+
+多重继承在一般情况下仍然会产生"类的扩散", 有m×n个类的声明, 每个声明形如:
+
+```python
+class FilteredSocketLogger(FilteredLogger, SocketLogger):
+    ...
+```
+
+不过python提供了一个变通方案.
+
+假设我们的应用程序读取一个配置文件, 从而知晓它使用什么过滤器和记录器, 这个文件的内容在运行时才会知道. 和提前构建所有m×n个可能的类然后选择一个合适的不同, 我们可以利用Python不需声明类, 而可以用内置的`type()`函数创建类的特性, 惰性得在运行时动态地创建新的类.
+
+```python
+# Imagine 2 filtered loggers and 3 output loggers.
+
+filters = {
+    'pattern': PatternFilteredLog,
+    'severity': SeverityFilteredLog,
+}
+outputs = {
+    'file': FileLog,
+    'socket': SocketLog,
+    'syslog': SyslogLog,
+}
+
+# Select the two classes we want to combine.
+
+with open('config') as f:
+    filter_name, output_name = f.read().split()
+
+filter_cls = filters[filter_name]
+output_cls = outputs[output_name]
+
+# Build a new derived class (!)
+
+name = filter_name.title() + output_name.title() + 'Log'
+cls = type(name, (filter_cls, output_cls), {})
+
+# Call it as usual to produce an instance.
+
+logger = cls(...)
+```
 
 https://python-patterns.guide/gang-of-four/composition-over-inheritance/
 
