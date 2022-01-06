@@ -647,6 +647,14 @@ cls = type(name, (filter_cls, output_cls), {})
 logger = cls(...)
 ```
 
+传递给`type()`的类的元组与类声明中的一组基类具有相同的意义. 上面的`type()`调用通过对过滤型记录器和输出型记录器的多重继承创建了一个新的类. 
+
+在你提问之前: 是的, 以纯文本形式建立一个类声明, 然后将其传递给`eval()`, 也是可以的.
+
+但是, 动态创建类会带来严重的责任.
+
+1. 
+
 https://python-patterns.guide/gang-of-four/composition-over-inheritance/
 
 
