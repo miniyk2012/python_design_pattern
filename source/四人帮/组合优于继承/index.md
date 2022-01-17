@@ -653,9 +653,5 @@ logger = cls(...)
 
 但是, 动态创建类会带来严重的责任.
 
-1. 
 
 https://python-patterns.guide/gang-of-four/composition-over-inheritance/
-
-
-
