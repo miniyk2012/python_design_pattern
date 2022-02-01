@@ -369,7 +369,7 @@ Error: this is important
 
 这里有一个关键的教训:像组合优于继承这样的设计原则, 最终要比Adapter或Decorator这样的个别模式更重要. 始终遵循原则, 而不要总是被限制在官方列表中选择模式. 我们现在得出的设计比以前的任何一个设计都更灵活, 也更容易维护, 尽管前面的设计是基于官方的四人帮模式, 但这个最终的设计却不是. 有时候, 是的, 你会发现一个现有的设计模式完全适合你的问题 -- 但如果不是, 那只要你比它们好就行.
 
-## 诡计: "if"语句
+## 回避: "if"语句
 
 我怀疑上面的代码让许多读者感到惊奇. 对于一个典型的Python程序员来说, 如此大量地使用类可能看起来完全是矫揉造作的 --这是一种试图使1980年代的旧观念与现代Python相关的尴尬做法.
 
@@ -429,7 +429,7 @@ if语句的方法并非完全没有好处. 这个类的所有可能的行为都�
 
 由于所有这些原因, 我表明了从软件设计的角度来看, if语句森林的表面简单性在很大程度上是一种错觉. 将logger的代码自上而下阅读的能力, 是以其他几种概念上的花费为代价的, 这些花费会随着代码库的大小而急剧增长.
 
-## 诡计: 多继承
+## 回避: 多继承
 
 Some Python projects fall short of practicing Composition Over Inheritance because they are tempted to dodge the principle by means of a controversial feature of the Python language: multiple inheritance.
 
@@ -528,7 +528,7 @@ The socket received: b'Error: this is important\n'
 
 那么, 多重继承就会承担一些责任, 而没有增加任何有点. 至少在这个例子中, 用继承来解决设计问题, 严格来说比基于组合的设计要差. 
 
-## 诡计: 混入(Mixins)
+## 回避: 混入(Mixins)
 
 上节提到的`FilteredSocketLogger`需要自定义`__init__()`方法, 因为它需要为2个基类提供参数, 但这是可以避免的. 当然如果子类不再需要额外的数据, 问题就不复存在. 但即使子类需要额外的数据, 也可以用其他方式来提供.
 
@@ -601,7 +601,7 @@ Error: this is important
 
 但所有其他多重继承的责任仍然适用于混入. 因此尽管混入模式提高了代码可读性并且在概念是简化了多重继承, 但它仍然不是彻底的解决方案.
 
-## 诡计: 动态构建类
+## 回避: 动态构建类
 
 正如我们在前两节所看到的, 无论是传统的多重继承还是混入，都不能解决四人帮的"所有组合的子类爆炸"问题 -- 它们只是在需要组合两个类时避免了代码的重复.
 
@@ -657,7 +657,11 @@ logger = cls(...)
 
 2. 如果创建诸如`PatternFilteredFileLog`这样的类时发生异常, 开发者可能没法愉快得在代码中搜索到类名. 在无法定位代码位置时debug显然更加困难. 考虑一下花在搜索`type()`调用并找到是哪里生成类所花费的时间. 有时候开发者不得不诉诸于用错误参数调用每一个方法, 并使用报错堆栈的行号来跟踪到基类.
 
-3. 
+3. 在一般情况下，对于在运行时动态构建的类，类型自省会失败. 当你在调试器中选中 `PatternFilteredFileLog` 的实例时，编辑器中的 "跳转到类" 快捷键将无处可寻. 像 [mypy](https://github.com/python/mypy) 和 [pyre-check](https://github.com/facebook/pyre-check) 这样的类型检查引擎将不可能为你生成的类提供强大的保护, 就像它们能够为普通的 Python 类提供的那样.
+
+4. 精美的Jupyter记事本功能`%autoreload`拥有一种近乎超自然的能力, 可以检测并重新加载实时Python解释器中修改过的源代码. 但此时它不再生效, 例如`matplotlib`在运行时通过[`subplot_class_factory()`](https://github.com/matplotlib/matplotlib/blob/54b426397c0e7567edaee4f7f77036c2b8569573/lib/matplotlib/axes/_subplots.py#L180)中的`type()`调用创建的多个继承类.
+
+一旦权衡了它的责任，试图用运行时类的生成作为最后的手段来挽救已经有问题的多重继承机制, 只是对当你需要一个对象的行为在几个独立的轴上变化时，回避"组合优于继承"的所有举措的一种归谬法罢了.
 
 
 https://python-patterns.guide/gang-of-four/composition-over-inheritance/
