@@ -31,3 +31,52 @@ SSL_HANDSHAKE_TIMEOUT = 60.0  # asyncio.constants.py
 TICK = "'"                    # email.utils.py
 CRLF = "\r\n"                 # smtplib.py
 ```
+
+记住称之为"常量"只是说对象本身不可改变, 但名称仍然可以被重新分配.
+
+```python
+import calendar
+calendar.January = 13
+print(calendar.January)
+```
+```bash
+13
+```
+名称也可以被删除:
+```python
+del calendar.January
+print(calendar.January)
+```
+```bash
+Traceback (most recent call last):
+  ...
+AttributeError: module 'calendar' has no attribute 'January'
+```
+除了整数、浮点数和字符串之外, 常量还包括不可变的容器, 如元祖和不可变集合:
+```python
+all_errors = (Error, OSError, EOFError)  # ftplib.py
+bytes_types = (bytes, bytearray)         # pickle.py
+DIGITS = frozenset("0123456789")         # sre_parse.py
+```
+更专门的不可变数据类型也可以作为常量:
+```python
+_EPOCH = datetime(1970, 1, 1, tzinfo=timezone.utc)  # datetime
+```
+在极少数情况下, 明显不打算修改的模块全局常量还是会使用可变数据结构. 在`frozenset`发明之前的代码中, 普通的可变集很常见. 例如至今仍在使用的字典, 因为标准库没有提供不可变字典.
+```python
+# socket.py
+_blocking_errnos = { EAGAIN, EWOULDBLOCK }
+```
+```python
+# locale.py
+windows_locale = {
+  0x0436: "af_ZA", # Afrikaans
+  0x041c: "sq_AL", # Albanian
+  0x0484: "gsw_FR",# Alsatian - France
+  ...
+  0x0435: "zu_ZA", # Zulu
+}
+```
+
+https://python-patterns.guide/python/module-globals/#the-constant-pattern
+
