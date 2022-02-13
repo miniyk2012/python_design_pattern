@@ -662,6 +662,3 @@ logger = cls(...)
 4. 精美的Jupyter记事本功能`%autoreload`拥有一种近乎超自然的能力, 可以检测并重新加载实时Python解释器中修改过的源代码. 但此时它不再生效, 例如`matplotlib`在运行时通过[`subplot_class_factory()`](https://github.com/matplotlib/matplotlib/blob/54b426397c0e7567edaee4f7f77036c2b8569573/lib/matplotlib/axes/_subplots.py#L180)中的`type()`调用创建的多个继承类.
 
 一旦权衡了它的责任，试图用运行时类的生成作为最后的手段来挽救已经有问题的多重继承机制, 只是对当你需要一个对象的行为在几个独立的轴上变化时，回避"组合优于继承"的所有举措的一种归谬法罢了.
-
-
-https://python-patterns.guide/gang-of-four/composition-over-inheritance/

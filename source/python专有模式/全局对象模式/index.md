@@ -78,6 +78,16 @@ windows_locale = {
   0x0435: "zu_ZA", # Zulu
 }
 ```
+Constants are often introduced as a refactoring: the programmer notices that the same value 60.0 is appearing repeatedly in their code, and so introduces a constant SSL_HANDSHAKE_TIMEOUT for the value instead. Each use of the name will now incur the slight cost of a search into the global scope, but this is balanced by a couple of advantages. The constant’s name now documents the value’s meaning, improving the code’s readability. And the constant’s assignment statement now provides a single location where the value can be edited in the future without needing to hunt through the code for each place 60.0 was used.
+
+常量通常是作为重构引入的: 程序员注意到相同的值`60.0`反复出现在他们的代码中, 因此为该值引入了一个常量`SSL_HANDSHAKE_TIMEOUT`. 现在, 每次使用这个名字都会付出在全局范围内进行搜索的轻微代价, 但这被一些优势所平衡. 常量的名称现在记录了值的含义, 提高了代码的可读性. 常量的赋值语句现在提供了一个单一的位置, 将来可以在那里编辑这个值，而不需要在代码中寻找每个使用`60.0`的地方.
+
+这些优点是非常重要的, 有时甚至会为一个只使用一次的值引入常量, 将一个隐藏在代码深处的名字提升到全局可见.
+
+有些程序员把常量赋值放在靠近使用它们的代码的地方; 有些程序员则把所有常量放在文件的顶部. 除非常量被放在离代码很近的地方，以至于人们总是能看到它, 否则把常量放在模块的顶部会更友好, 便于那些还没有把编辑器配置为支持跳转定义的读者参考.
+
+另一种常量不是对内的 -- 针对模块本身的代码, 而是向外的 -- 作为模块暴露的API的一部分. 像`logging`模块中的`WARNING`这样的常量为调用者提供了常量的优势: 代码将更加可读, 常量的值可以在以后调整, 而不需要每个调用者动他们的代码.
+
 
 https://python-patterns.guide/python/module-globals/#the-constant-pattern
 
