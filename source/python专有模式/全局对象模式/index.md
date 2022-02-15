@@ -88,6 +88,9 @@ Constants are often introduced as a refactoring: the programmer notices that the
 
 另一种常量不是对内的 -- 针对模块本身的代码, 而是向外的 -- 作为模块暴露的API的一部分. 像`logging`模块中的`WARNING`这样的常量为调用者提供了常量的优势: 代码将更加可读, 常量的值可以在以后调整, 而不需要每个调用者动他们的代码.
 
+你可能期望一个供模块自己使用而不非供调用者使用的常量总是以下划线开始, 以标记它为私有. 但是Python程序员在标记常量为私有的记号并不一致, 这也许是因为永远锁定一个常量比永远锁定一个辅助函数或类的API的代价要小.
+
+## 导入的时间花销
 
 https://python-patterns.guide/python/module-globals/#the-constant-pattern
 
