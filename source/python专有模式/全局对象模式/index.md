@@ -92,5 +92,16 @@ Constants are often introduced as a refactoring: the programmer notices that the
 
 ## 导入的时间花销
 
+Sometimes constants are introduced for efficiency, to avoid recomputing a value every time code is called. For example, even though math operations involving literal numbers are in fact optimized away in all modern Python implementations, developers often still feel more comfortable making it explicit that the math should be done at import time by assigning the result to a module global:
+
+有时引入常量是为了提高效率，以避免每次调用代码时重新计算值. 例如, 尽管在所有的现代Python实现中, 涉及字面数字的数学运算实际上已经被优化掉了,  但开发者仍喜欢这样的数在导入时计算并赋值给一个模块全局值:
+
+```python
+# zipfile.py
+ZIP_FILECOUNT_LIMIT = (1 << 16) - 1
+```
+
+当数学表达式很复杂时, 指定一个名称也能增强代码的可读性.
+
 https://python-patterns.guide/python/module-globals/#the-constant-pattern
 
