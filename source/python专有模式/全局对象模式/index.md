@@ -78,7 +78,6 @@ windows_locale = {
   0x0435: "zu_ZA", # Zulu
 }
 ```
-Constants are often introduced as a refactoring: the programmer notices that the same value 60.0 is appearing repeatedly in their code, and so introduces a constant SSL_HANDSHAKE_TIMEOUT for the value instead. Each use of the name will now incur the slight cost of a search into the global scope, but this is balanced by a couple of advantages. The constant’s name now documents the value’s meaning, improving the code’s readability. And the constant’s assignment statement now provides a single location where the value can be edited in the future without needing to hunt through the code for each place 60.0 was used.
 
 常量通常是作为重构引入的: 程序员注意到相同的值`60.0`反复出现在他们的代码中, 因此为该值引入了一个常量`SSL_HANDSHAKE_TIMEOUT`. 现在, 每次使用这个名字都会付出在全局范围内进行搜索的轻微代价, 但这被一些优势所平衡. 常量的名称现在记录了值的含义, 提高了代码的可读性. 常量的赋值语句现在提供了一个单一的位置, 将来可以在那里编辑这个值，而不需要在代码中寻找每个使用`60.0`的地方.
 
@@ -102,6 +101,13 @@ ZIP_FILECOUNT_LIMIT = (1 << 16) - 1
 ```
 
 当数学表达式很复杂时, 指定一个名称也能增强代码的可读性.
+
+再比如, 存在着一些特殊的浮点值, 它们不能在Python中写成字面值; 它们只能通过向float类型传递一个字符串来生成. 为了避免每次需要这样的值时都用`'nan'`或`'inf'`来调用`float()`, 模块通常只创建一次这样的值并将其设置为模块全局值.
+
+```python
+# encoder.py
+INFINITY = float('inf')
+```
 
 https://python-patterns.guide/python/module-globals/#the-constant-pattern
 
